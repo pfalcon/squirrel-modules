@@ -348,7 +348,7 @@ static SQInteger sqratbase_import(HSQUIRRELVM v) {
 SQRESULT sqrat_register_importlib(HSQUIRRELVM v) {
     sq_pushroottable(v);
 
-    sq_pushstring(v, _SC("import"), -1);
+    sq_pushstring(v, _SC("_import_"), -1);
     sq_newclosure(v, &sqratbase_import, 0);
     sq_newslot(v, -3, 0);
 
