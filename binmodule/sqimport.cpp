@@ -315,8 +315,11 @@ SQRESULT sqrat_import(HSQUIRRELVM v) {
         fname += moduleName;
         fname += ".nut";
         res = try_import_path(v, fname);
-        if (res == NOT_FOUND)
-            res = SQ_ERROR;
+        if (res == NOT_FOUND) {
+            sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
+            sq_release(v, &table);
+            return sq_throwerror(v, _SC("Module not found"));
+        }
     }
 
     sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
@@ -340,9 +343,7 @@ static SQInteger sqratbase_import(HSQUIRRELVM v) {
         break;
     }
 
-    sqrat_import(v);
-
-    return 1;
+    return sqrat_import(v);
 }
 
 SQRESULT sqrat_register_importlib(HSQUIRRELVM v) {
