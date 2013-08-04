@@ -25,7 +25,7 @@
 //  distribution.
 //
 
-#include "sqratimport.h"
+#include "sqimport.h"
 #include "sqmodule.h"
 
 //#include "sqratlib/sqratBase.h"
