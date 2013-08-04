@@ -31,6 +31,8 @@
 //#include "sqratlib/sqratBase.h"
 #include <sqstdio.h>
 #include <string>
+// getenv
+#include <stdlib.h>
 
 #if defined(_WIN32)
 
@@ -192,13 +194,9 @@ static HSQAPI sqrat_newapi() {
 }
 
 
-static SQRESULT sqrat_importscript(HSQUIRRELVM v, const SQChar* moduleName) {
-    std::basic_string<SQChar> filename(moduleName);
-    filename += _SC(".nut");
-    if(SQ_FAILED(sqstd_loadfile(v, moduleName, true))) {
-        if(SQ_FAILED(sqstd_loadfile(v, filename.c_str(), true))) {
-            return SQ_ERROR;
-        }
+static SQRESULT sqrat_importscript(HSQUIRRELVM v, const SQChar* filename) {
+    if(SQ_FAILED(sqstd_loadfile(v, filename, true))) {
+        return SQ_ERROR;
     }
     sq_push(v, -2);
     sq_call(v, 1, false, true);
@@ -252,6 +250,34 @@ static SQRESULT sqrat_importbin(HSQUIRRELVM v, const SQChar* moduleName) {
 #endif
 }
 
+bool file_exists(const SQChar* filename)
+{
+    return access(filename, F_OK) == 0;
+}
+
+#define NOT_FOUND 100
+
+SQRESULT try_import_path(HSQUIRRELVM v, std::basic_string<SQChar>& fname)
+{
+    // Try to import module at given path. This tries
+    // different module types in order.
+
+    // Check binary module
+    fname[fname.size() - 1] = 'd';
+    if (file_exists(fname.c_str()))
+        return sqrat_importbin(v, fname.c_str());
+    // Check bytecode module
+    fname[fname.size() - 1] = 'c';
+    if (file_exists(fname.c_str()))
+        return sqrat_importscript(v, fname.c_str());
+    // Check source module
+    fname[fname.size() - 1] = 't';
+    if (file_exists(fname.c_str()))
+        return sqrat_importscript(v, fname.c_str());
+
+    return NOT_FOUND;
+}
+
 SQRESULT sqrat_import(HSQUIRRELVM v) {
     const SQChar* moduleName;
     HSQOBJECT table;
@@ -265,8 +291,32 @@ SQRESULT sqrat_import(HSQUIRRELVM v) {
     sq_settop(v, 0); // Clear Stack
     sq_pushobject(v, table); // Push the target table onto the stack
 
-    if(SQ_FAILED(sqrat_importscript(v, moduleName))) {
-        res = sqrat_importbin(v, moduleName);
+    std::basic_string<SQChar> fname;
+    // Explicit path is needed for dlopen() later, and won't hurt
+    // for other cases
+    fname = "./";
+    fname += moduleName;
+    fname += ".nut";
+    res = try_import_path(v, fname);
+    if (res == NOT_FOUND) {
+        const char *path = getenv("SQPATH");
+        if (path)
+            fname = path;
+        else {
+            path = getenv("HOME");
+            if (path) {
+                fname = path;
+                fname += "/.squirrel/lib";
+            } else {
+                fname = "/usr/lib/squirrel";
+            }
+        }
+        fname += "/";
+        fname += moduleName;
+        fname += ".nut";
+        res = try_import_path(v, fname);
+        if (res == NOT_FOUND)
+            res = SQ_ERROR;
     }
 
     sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
