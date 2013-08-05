@@ -30,6 +30,20 @@
 
 #include "squirrel.h"
 
+#ifdef MODULE_STATIC
+ #define SQAPI(meth) sq_##meth
+ #define DECLARE_SQAPI
+ #define INIT_SQAPI(api)
+ #define _SQMODCONC(a, b) a ## b
+ #define SQMODCONC(a, b) _SQMODCONC(a, b)
+ #define MODULE_INIT SQMODCONC(sqmodule_load_, MODULE)
+#else
+ #define SQAPI(meth) sqapi->meth
+ #define DECLARE_SQAPI static HSQAPI sqapi;
+ #define INIT_SQAPI(api) sqapi = api
+ #define MODULE_INIT sqmodule_load
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
