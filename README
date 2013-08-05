@@ -1,0 +1,26 @@
+squirrel-modules is a project to provide clean, flexible and extensible
+module import system for Squirrel programming language
+(http://squirrel-lang.org/), as well as few basic modules which would be
+of interest to many users. It's not intended to be vast collection of
+modules, but rather, set of technologies and best practices allowing
+users to provide quality modules on their own, aiming towards distributed
+community-supported module repositories as available for many popular
+languages (CPAN for Perl, PyPi for Python, etc.)
+
+squirrel-modules consists of the following subdirs:
+
+binmodule
+    Support for dynamically loadable binary (i.e. compiled C/C++ code)
+    modules. This code also provides means to support both static and
+    dynamic using the same source code, as well as transparently support
+    Squirrel source, Squirrel bytecode, and binary module loading.
+    Summing up, binmodule provides low-level module import framework.
+
+import
+    High-level import framework. This uses binmodule facilities
+    underneath. Import framework is modeled after Python's import
+    functionality and provides import() and import_from() functions
+    for flexible namespace and symbol management.
+
+simple
+    Example of trivial C module written using binmodule framework.
