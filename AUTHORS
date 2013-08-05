@@ -1,0 +1,9 @@
+squirrel-modules project contains source code from many authors, among them:
+
+binmodule/ is based on Sqratimport by Brandon Jones, maintained by
+Li-Cheng (Andy) Tai
+
+Rest of the code, modifications/cleanups to the code above, putting together
+squirrel-modules by Paul Sokolovsky.
+
+For detailed authorship information, see individual files.
