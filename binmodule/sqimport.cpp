@@ -213,31 +213,24 @@ static SQRESULT sqrat_importbin(HSQUIRRELVM v, const SQChar* moduleName) {
 
 #if defined(_WIN32)
     HMODULE mod;
-    mod = GetModuleHandle(moduleName);
-    if(mod == NULL) {
-        mod = LoadLibrary(moduleName);
-        if(mod == NULL) {
-            return SQ_ERROR;
-        }
-    }
+    mod = LoadLibrary(moduleName);
+    if (mod == NULL)
+        return sq_throwerror(v, _SC("Could not load module"));
 
     modLoad = (SQMODULELOAD)GetProcAddress(mod, "sqmodule_load");
     if(modLoad == NULL) {
         FreeLibrary(mod);
-        return SQ_ERROR;
+        return sq_throwerror(v, _SC("Could not get module init routine"));
     }
 #elif defined(__unix)
-    /* adding .so to moduleName? */
-    void *mod = dlopen(moduleName, RTLD_NOW | RTLD_LOCAL | RTLD_NOLOAD); //RTLD_NOLOAD flag is not specified in POSIX.1-2001..so not the best solution :(
-    if (mod == NULL) {
-        mod = dlopen(moduleName, RTLD_NOW | RTLD_LOCAL);
-        if (mod == NULL)
-            return SQ_ERROR;
-    }
-    modLoad = (SQMODULELOAD) dlsym(mod, "sqmodule_load");
+    void *mod = dlopen(moduleName, RTLD_NOW | RTLD_LOCAL);
+    if (mod == NULL)
+        return sq_throwerror(v, _SC("Could not load module"));
+
+    modLoad = (SQMODULELOAD)dlsym(mod, "sqmodule_load");
     if (modLoad == NULL) {
         dlclose(mod);
-        return SQ_ERROR;
+        return sq_throwerror(v, _SC("Could not get module init routine"));
     }
 #endif
 
