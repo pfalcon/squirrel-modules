@@ -1,9 +1,10 @@
 //
-// SqratImport: Supports importing of squirrel modules
+// SqImport: Supports importing of squirrel modules
 //
 
 //
 // Copyright (c) 2009 Brandon Jones
+// Copyright (c) 2013 Paul Sokolovsky
 //
 // This software is provided 'as-is', without any express or implied
 // warranty. In no event will the authors be held liable for any damages
