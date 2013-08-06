@@ -206,6 +206,8 @@ extern "C" {
     } sq_api;
     typedef sq_api* HSQAPI;
 
+    SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api);
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
