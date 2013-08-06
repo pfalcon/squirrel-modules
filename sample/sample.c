@@ -17,7 +17,7 @@ SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
 {
     printf("in sqmodule_load\n");
 
-    INIT_SQAPI(api);
+    INIT_SQAPI(v, api);
 
     SQAPI(pushstring)(v, _SC("func"), -1);
     SQAPI(newclosure)(v, func, 0);
