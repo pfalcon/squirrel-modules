@@ -15,11 +15,9 @@
 */
 
 function import(module, as = null) {
-    local rootenv = getroottable();
-    print("my roottable: " + rootenv + "\n")
-    local modenv = clone rootenv;
-    modenv.dofile(module + ".nut");
-    rootenv[as ? as : module] = modenv;
+    local modenv = {};
+    _import_(module, modenv)
+    getroottable()[as ? as : module] = modenv;
 }
 
 
@@ -47,10 +45,10 @@ function import(module, as = null) {
 */
 function import_from(module, what, as = null) {
     if (what == "*") {
-        dofile(module + ".nut")
+        _import_(module)
     } else {
-        local modenv = clone getroottable();
-        modenv.dofile(module + ".nut");
+        local modenv = {};
+        _import_(module, modenv);
         if (as) {
             getroottable()[as] = modenv[what];
             return;
