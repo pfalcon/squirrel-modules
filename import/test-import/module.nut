@@ -1,9 +1,9 @@
 function func()
 {
-    print("Hello, modules!\n");
+    return "This is func";
 }
 
 function func2()
 {
-    print("Here too\n");
+    return "func2 speaking";
 }
