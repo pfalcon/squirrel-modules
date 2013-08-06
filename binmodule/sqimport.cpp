@@ -54,6 +54,7 @@ static HSQAPI sqapi = NULL;
 static HSQAPI sqrat_newapi() {
     HSQAPI sq = (HSQAPI)sq_malloc(sizeof(sq_api));
 
+    sq->version = SQMODULE_API_VERSION;
     /*vm*/
     sq->open = sq_open;
     sq->newthread = sq_newthread;

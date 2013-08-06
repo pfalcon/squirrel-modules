@@ -40,9 +40,13 @@
 #else
  #define SQAPI(meth) sqapi->meth
  #define DECLARE_SQAPI static HSQAPI sqapi;
- #define INIT_SQAPI(api) sqapi = api
+ #define INIT_SQAPI(vm, api) { sqapi = api; \
+    if (api->version != SQMODULE_API_VERSION) \
+      return api->throwerror(vm, _SC("API version mismatch on module load")); }
  #define MODULE_INIT sqmodule_load
 #endif
+
+#define SQMODULE_API_VERSION 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,6 +58,9 @@ extern "C" {
         If new functions are added to the Squirrel API, they should be added here too
     */
     typedef struct {
+        /* API version - if any change happen to this struct,
+           SQMODULE_API_VERSION above should be incremented. */
+        int             version;
         /*vm*/
         HSQUIRRELVM     (*open)(SQInteger initialstacksize);
         HSQUIRRELVM     (*newthread)(HSQUIRRELVM friendvm, SQInteger initialstacksize);
