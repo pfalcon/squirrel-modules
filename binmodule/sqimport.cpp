@@ -273,7 +273,7 @@ SQRESULT try_import_path(HSQUIRRELVM v, std::basic_string<SQChar>& fname)
     return NOT_FOUND;
 }
 
-SQRESULT sqrat_import(HSQUIRRELVM v) {
+SQInteger sqrat_import(HSQUIRRELVM v) {
     const SQChar* moduleName;
     HSQOBJECT table;
     SQRESULT res = SQ_OK;
@@ -320,8 +320,10 @@ SQRESULT sqrat_import(HSQUIRRELVM v) {
     sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
     sq_pushobject(v, table); // return the target table
     sq_release(v, &table);
-    
-    return res;
+
+    // If we didn't thro exception, then we return value
+    if (res != SQ_ERROR)
+        return 1;
 }
 
 static SQInteger sqratbase_import(HSQUIRRELVM v) {
