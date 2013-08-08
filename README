@@ -24,3 +24,10 @@ import
 
 simple
     Example of trivial C module written using binmodule framework.
+
+To use squirrel-modules, you need Squirrel with the patches to address
+some language misfeatures or lack of builtin functionality:
+https://github.com/pfalcon/squirrel-lang/tree/squirrel3-pfalcon
+
+For more information about squirrel-modules ideas, see RFC on Squirrel
+forum: http://forum.squirrel-lang.org/mainsite/forums/default.aspx?g=posts&t=3122
