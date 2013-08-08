@@ -147,8 +147,8 @@ static void sq_register_funcs(HSQUIRRELVM sqvm, SQRegFunction *obj_funcs) {
 }
 
 static SQRegFunction funcs[] = {
-    {"dlopen", m_dlopen, 2, _SC(".s")},
-    {"dlsym", m_dlsym, 3, _SC(".ps")},
+    {"load", m_dlopen, 2, _SC(".s")},
+    {"sym", m_dlsym, 3, _SC(".ps")},
     {"ffi", m_ffi_prepare, 4, _SC(".psa")},
     {NULL}
 };
