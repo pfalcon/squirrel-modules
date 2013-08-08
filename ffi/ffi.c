@@ -14,6 +14,8 @@ static SQInteger m_dlopen(HSQUIRRELVM v)
     const SQChar *fname;
     sq_getstring(v, 2, &fname);
     void *mod = dlopen(fname, RTLD_NOW | RTLD_LOCAL);
+    if (!mod)
+        return sq_throwerror(v, "Cannot load library");
     sq_pushuserpointer(v, mod);
     return 1;
 }
@@ -26,7 +28,8 @@ static SQInteger m_dlsym(HSQUIRRELVM v)
     sq_getstring(v, 3, &symname);
     void *sym = dlsym(mod, symname);
     printf("dlsym(%s) = %p\n", symname, sym);
-    ((int(*)(char*))sym)("Call test\n");
+    if (!sym)
+        return sq_throwerror(v, "Cannot find symbol");
     sq_pushuserpointer(v, sym);
     return 1;
 }
