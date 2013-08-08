@@ -151,6 +151,11 @@ static SQInteger m_ffi_call(HSQUIRRELVM v)
         case OT_STRING:
             sq_getstring(v, i, (const char**)&values[pi]);
             break;
+        case OT_INSTANCE: {
+            if (SQ_FAILED(sqstd_getblob(v, i, (SQUserPointer*)&values[pi])))
+                return SQ_ERROR;
+            break;
+        }
         default:
             return sq_throwerror(v, "Unimplemented type");
         }
