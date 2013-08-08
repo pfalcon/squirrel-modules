@@ -145,11 +145,14 @@ static SQInteger m_ffi_call(HSQUIRRELVM v)
     for (i = EXTRA_PARAMS + 1; i <= top; i++) {
         #define pi (i - (EXTRA_PARAMS + 1))
         switch (sq_gettype(v, i)) {
+        case OT_INTEGER:
+            sq_getinteger(v, i, (int*)&values[pi]);
+            break;
         case OT_STRING:
             sq_getstring(v, i, (const char**)&values[pi]);
             break;
         default:
-            values[pi] = 0;
+            return sq_throwerror(v, "Unimplemented type");
         }
         valueptrs[pi] = &values[pi];
     }
