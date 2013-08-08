@@ -1,4 +1,4 @@
 print(_import_ + "\n")
-_import_("sample")
+_import_("../sample")
 
 #assert(func() == "Hello, modules!")
