@@ -31,6 +31,7 @@
 
 //#include "sqratlib/sqratBase.h"
 #include <sqstdio.h>
+#include <sqstdblob.h>
 #include <string>
 // getenv
 #include <stdlib.h>
@@ -191,6 +192,9 @@ static HSQAPI sqrat_newapi() {
     /*debug*/
     sq->stackinfos = sq_stackinfos;
     sq->setdebughook = sq_setdebughook;
+
+    /*stdlib*/
+    sq->getblob = sqstd_getblob;
 
     return sq;
 }

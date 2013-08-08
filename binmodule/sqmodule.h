@@ -46,7 +46,7 @@
  #define MODULE_INIT sqmodule_load
 #endif
 
-#define SQMODULE_API_VERSION 1
+#define SQMODULE_API_VERSION 2
 
 #ifdef __cplusplus
 extern "C" {
@@ -210,6 +210,9 @@ extern "C" {
         /*debug*/
         SQRESULT        (*stackinfos)(HSQUIRRELVM v,SQInteger level,SQStackInfos *si);
         void            (*setdebughook)(HSQUIRRELVM v);
+
+        /*stdlib*/
+        SQRESULT        (*getblob)(HSQUIRRELVM v,SQInteger idx,SQUserPointer *ptr);
     } sq_api;
     typedef sq_api* HSQAPI;
 
