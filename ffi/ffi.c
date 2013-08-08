@@ -34,16 +34,38 @@ static SQInteger m_dlsym(HSQUIRRELVM v)
     return 1;
 }
 
-static ffi_type *get_ffi_type(const char *t)
+static ffi_type *char2ffi_type(char c)
 {
-    switch (*t) {
+    switch (c) {
     case 'I':
         return &ffi_type_uint;
     case 'P':
     case 's':
         return &ffi_type_pointer;
     default:
-        return &ffi_type_uint;
+        return NULL;
+    }
+}
+
+static ffi_type *get_ffi_type(HSQUIRRELVM v, int idx)
+{
+    int type = sq_gettype(v, idx);
+    void *p;
+    const SQChar *s;
+    ffi_type *t;
+
+    switch (type) {
+    case OT_USERPOINTER:
+        sq_getuserpointer(v, idx, &p);
+        return p;
+    case OT_STRING:
+        sq_getstring(v, idx, &s);
+        t = char2ffi_type(*s);
+        if (t)
+            return t;
+    default:
+        sq_throwerror(v, "Type spec must be string or ffi_type");
+        return NULL;
     }
 }
 
@@ -77,13 +99,12 @@ static SQInteger m_ffi_prepare(HSQUIRRELVM v)
         const char *paramtype;
         sq_pushinteger(v, i);
         sq_get(v, 4);
-        if (sq_gettype(v, -1) != OT_STRING)
-            return sq_throwerror(v, "Parameter types must be strings");
-        sq_getstring(v, -1, &paramtype);
-        ffibuf->params[i] = get_ffi_type(paramtype);
+        ffibuf->params[i] = get_ffi_type(v, -1);
+        if (!ffibuf->params[i])
+            return SQ_ERROR;
         sq_poptop(v);
     }
-    int res = ffi_prep_cif(&ffibuf->cif, FFI_DEFAULT_ABI, nparam, get_ffi_type(rettype), ffibuf->params);
+    int res = ffi_prep_cif(&ffibuf->cif, FFI_DEFAULT_ABI, nparam, char2ffi_type(*rettype), ffibuf->params);
     if (res != FFI_OK)
         return sq_throwerror(v, "Error in ffi_prep_cif");
     return 1;
