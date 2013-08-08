@@ -158,6 +158,27 @@ static SQRegFunction methods[] = {
     {NULL}
 };
 
+struct FFI_type_name {
+    const char* name;
+    ffi_type *type;
+};
+
+static struct FFI_type_name ffi_types_wrap[] = {
+    {"void",    &ffi_type_void},
+    {"schar",   &ffi_type_schar},
+    {"uchar",   &ffi_type_uchar},
+    {"sshort",  &ffi_type_sshort},
+    {"ushort",  &ffi_type_ushort},
+    {"sint",    &ffi_type_sint},
+    {"uint",    &ffi_type_uint},
+    {"slong",   &ffi_type_slong},
+    {"ulong",   &ffi_type_ulong},
+    {"float",   &ffi_type_float},
+    {"double",  &ffi_type_double},
+    {"pointer", &ffi_type_pointer},
+    {NULL}
+};
+
 SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
 {
     printf("in sqmodule_load\n");
@@ -165,6 +186,14 @@ SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
     INIT_SQAPI(v, api);
 
     sq_register_funcs(v, funcs);
+
+    int i;
+    for (i = 0; ffi_types_wrap[i].name != 0; i++) {
+        struct FFI_type_name *e = &ffi_types_wrap[i];
+        sq_pushstring(v, e->name, -1);
+        sq_pushuserpointer(v, e->type);
+        sq_newslot(v, -3, SQFalse);
+    }
 
     sq_newtable(v);
     sq_register_funcs(v, methods);
