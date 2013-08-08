@@ -37,8 +37,18 @@ static SQInteger m_dlsym(HSQUIRRELVM v)
 static ffi_type *char2ffi_type(char c)
 {
     switch (c) {
+    case 'b':
+        return &ffi_type_schar;
+    case 'B':
+        return &ffi_type_uchar;
+    case 'i':
+        return &ffi_type_sint;
     case 'I':
         return &ffi_type_uint;
+    case 'l':
+        return &ffi_type_slong;
+    case 'L':
+        return &ffi_type_ulong;
     case 'P':
     case 's':
         return &ffi_type_pointer;
