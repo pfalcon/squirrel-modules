@@ -37,14 +37,17 @@ static ffi_type *get_ffi_type(const char *t)
     case 'I':
         return &ffi_type_uint;
     case 'P':
+    case 's':
         return &ffi_type_pointer;
+    default:
+        return &ffi_type_uint;
     }
-    return &ffi_type_uint;
 }
 
 struct FFIData
 {
     void *func;
+    char rettype;
     ffi_cif cif;
     ffi_type *params[0];
 };
@@ -64,6 +67,7 @@ static SQInteger m_ffi_prepare(HSQUIRRELVM v)
 
     printf("Allocated %d bytes at %p\n", size, ffibuf);
     ffibuf->func = sym;
+    ffibuf->rettype = *rettype;
 
     int i;
     for (i = 0; i < nparam; i++) {
@@ -115,10 +119,17 @@ static SQInteger m_ffi_call(HSQUIRRELVM v)
         }
         valueptrs[pi] = &values[pi];
     }
+
     int rc;
     printf("Before call, %p\n", ffibuf->func);
     ffi_call(&ffibuf->cif, ffibuf->func, &rc, valueptrs);
-    sq_pushinteger(v, rc);
+    switch (ffibuf->rettype) {
+    case 's':
+        sq_pushstring(v, (char*)rc, -1);
+        break;
+    default:
+        sq_pushinteger(v, rc);
+    }
     return 1;
 }
 
