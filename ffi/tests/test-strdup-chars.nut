@@ -1,4 +1,4 @@
-ffi = _import_("ffi", {})
+ffi = _import_("../ffi", {})
 
 mod = ffi.load("libc.so.6")
 print(mod + "\n")
