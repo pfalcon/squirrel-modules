@@ -35,6 +35,8 @@
 #include <string>
 // getenv
 #include <stdlib.h>
+// debugging
+#include <stdio.h>
 
 #if defined(_WIN32)
 
@@ -251,6 +253,7 @@ static SQRESULT sqrat_importbin(HSQUIRRELVM v, const SQChar* moduleName) {
 
 bool file_exists(const SQChar* filename)
 {
+//    printf("Trying %s\n", filename);
     return access(filename, F_OK) == 0;
 }
 
