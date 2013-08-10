@@ -7,6 +7,16 @@ users to provide quality modules on their own, aiming towards distributed
 community-supported module repositories as available for many popular
 languages (CPAN for Perl, PyPi for Python, etc.)
 
+Quick start:
+
+1. Check out repository using "git clone --recursive". This will also
+checkout modified Squirrel code as a git submodule. If you already
+cloned without --recursive, run "git submodule update".
+
+2. "cd binmodule; make" . This will build "sqrl" interpreter with
+module import support.
+
+
 squirrel-modules consists of the following subdirs:
 
 binmodule
