@@ -280,10 +280,14 @@ SQRESULT try_import_path(HSQUIRRELVM v, std::basic_string<SQChar>& fname)
 SQInteger sq_import(HSQUIRRELVM v) {
     const SQChar* moduleName;
     HSQOBJECT table;
+    HSQOBJECT mod;
     SQRESULT res = SQ_OK;
 
 
     sq_getstring(v, -2, &moduleName);
+    // module name may be gone behind our back as we reset stack
+    sq_getstackobj(v, -2, &mod);
+    sq_addref(v, &mod);
     sq_getstackobj(v, -1, &table);
     sq_addref(v, &table);
 
@@ -317,6 +321,7 @@ SQInteger sq_import(HSQUIRRELVM v) {
         if (res == NOT_FOUND) {
             sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
             sq_release(v, &table);
+            sq_release(v, &mod);
             return sq_throwerror(v, _SC("Module not found"));
         }
     }
@@ -324,6 +329,7 @@ SQInteger sq_import(HSQUIRRELVM v) {
     sq_settop(v, 0); // Clean up the stack (just in case the module load leaves it messy)
     sq_pushobject(v, table); // return the target table
     sq_release(v, &table);
+    sq_release(v, &mod);
 
     // If we didn't thro exception, then we return value
     if (res != SQ_ERROR)
