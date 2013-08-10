@@ -1,7 +1,6 @@
 #define MODULE ffi
 #include <sqmodule.h>
 #include <stdio.h>
-#include "sqmodapi.h"
 #include <dlfcn.h>
 #include <ffi.h>
 
@@ -38,7 +37,6 @@ static SQInteger m_dlsym(HSQUIRRELVM v)
         return sq_throwerror(v, "Cannot find symbol");
     void **p = (void*)sq_newuserdata(v, sizeof(sym));
     *p = sym;
-//    sq_pushuserpointer(v, sym);
     return 1;
 }
 
@@ -87,13 +85,13 @@ static ffi_type *get_ffi_type(HSQUIRRELVM v, int idx)
     }
 }
 
-struct FFIData
+typedef struct FFIFunc
 {
     void *func;
     char rettype;
     ffi_cif cif;
     ffi_type *params[0];
-};
+} FFIFunc;
 
 typedef struct FFIVar
 {
@@ -121,12 +119,12 @@ static SQInteger m_lib_func(HSQUIRRELVM v)
 
     int nparam = sq_getsize(v, 4);
 
-    int size = sizeof(struct FFIData) + sizeof(ffi_type*) * nparam;
-    struct FFIData *ffibuf = (struct FFIData *)sq_newuserdata(v, size);
+    int size = sizeof(FFIFunc) + sizeof(ffi_type*) * nparam;
+    FFIFunc *ffibuf = (FFIFunc*)sq_newuserdata(v, size);
     sq_pushobject(v, func_method_table);
     sq_setdelegate(v, -2);
 
-    printf("Allocated %d bytes at %p\n", size, ffibuf);
+//    printf("Allocated %d bytes at %p\n", size, ffibuf);
     ffibuf->func = sym;
     ffibuf->rettype = *rettype;
 
@@ -186,10 +184,10 @@ static SQInteger m_lib_var(HSQUIRRELVM v)
 static void return_ffi_value(HSQUIRRELVM v, int val, char type);
 static SQInteger m_func_call(HSQUIRRELVM v)
 {
-    struct FFIData *ffibuf;
+    FFIFunc *ffibuf;
     sq_getuserdata(v, 1, (void**)&ffibuf, NULL);
     int top = sq_gettop(v);
-    printf("ffibuf %p top %d\n", ffibuf, top);
+//    printf("ffibuf %p top %d\n", ffibuf, top);
 
     if (ffibuf->cif.nargs != top - EXTRA_PARAMS)
         return sq_throwerror(v, "Wrong number of args");
@@ -218,7 +216,7 @@ static SQInteger m_func_call(HSQUIRRELVM v)
     }
 
     int rc;
-    printf("Before call, %p\n", ffibuf->func);
+//    printf("Before call, %p\n", ffibuf->func);
     ffi_call(&ffibuf->cif, ffibuf->func, &rc, valueptrs);
     return_ffi_value(v, rc, ffibuf->rettype);
     return 1;
@@ -349,8 +347,6 @@ static struct FFI_type_name ffi_types_wrap[] = {
 
 SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
 {
-    printf("in sqmodule_load\n");
-
     INIT_SQAPI(v, api);
 
     sq_register_funcs(v, funcs);
@@ -366,8 +362,6 @@ SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
     sq_create_method_table(v, lib_methods, &lib_method_table);
     sq_create_method_table(v, func_methods, &func_method_table);
     sq_create_method_table(v, var_methods, &var_method_table);
-
-    printf("out sqmodule_load\n");
 
     return SQ_OK;
 }
