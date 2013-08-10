@@ -15,11 +15,8 @@
 */
 
 function import(module, as = null) {
-    local rootenv = getroottable();
-    local modenv = clone rootenv;
-    setroottable(modenv);
-    _import_(module, modenv);
-    setroottable(rootenv);
+    local modenv = {};
+    _import_(module, modenv)
     getroottable()[as ? as : module] = modenv;
 }
 
