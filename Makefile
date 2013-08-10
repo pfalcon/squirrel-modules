@@ -1,4 +1,4 @@
-MODULES = sample import ffi os
+MODULES = sample import ffi os socket
 
 all: sqrl modules
 
