@@ -12,3 +12,7 @@ sample.o: sample.c
 
 check test: $(MODULE).nud
 	(cd tests; ../../test-support/run-tests.sh)
+
+install: $(MODULE).nud
+	mkdir -p ~/.squirrel/lib/
+	cp $^ ~/.squirrel/lib/

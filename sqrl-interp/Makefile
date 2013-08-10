@@ -11,3 +11,7 @@ LDLIBS = -ldl
 dummy := $(shell cd $(TOP); make -f makefile clean)
 
 include $(TOP)/makefile
+
+install: stdlibinit.nut
+	mkdir -p ~/.squirrel/lib/
+	cp $^ ~/.squirrel/lib/
