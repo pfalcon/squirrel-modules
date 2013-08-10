@@ -7,7 +7,8 @@
 
 DECLARE_SQAPI
 
-static HSQOBJECT method_table;
+static HSQOBJECT lib_method_table;
+static HSQOBJECT ffi_method_table;
 
 static SQInteger m_dlopen(HSQUIRRELVM v)
 {
@@ -17,6 +18,10 @@ static SQInteger m_dlopen(HSQUIRRELVM v)
     if (!mod)
         return sq_throwerror(v, "Cannot load library");
     sq_pushuserpointer(v, mod);
+    void **p = (void*)sq_newuserdata(v, sizeof(mod));
+    *p = mod;
+    sq_pushobject(v, lib_method_table);
+    sq_setdelegate(v, -2);
     return 1;
 }
 
@@ -30,7 +35,9 @@ static SQInteger m_dlsym(HSQUIRRELVM v)
     printf("dlsym(%s) = %p\n", symname, sym);
     if (!sym)
         return sq_throwerror(v, "Cannot find symbol");
-    sq_pushuserpointer(v, sym);
+    void **p = (void*)sq_newuserdata(v, sizeof(sym));
+    *p = sym;
+//    sq_pushuserpointer(v, sym);
     return 1;
 }
 
@@ -87,17 +94,29 @@ struct FFIData
     ffi_type *params[0];
 };
 
-static SQInteger m_ffi_prepare(HSQUIRRELVM v)
+static SQInteger m_lib_func(HSQUIRRELVM v)
 {
+    void **modbuf;
+    void *mod;
     void *sym;
+    const SQChar *symname;
     const char *rettype;
-    sq_getuserpointer(v, 2, &sym);
-    sq_getstring(v, 3, &rettype);
+
+    sq_getuserdata(v, 1, (void**)&modbuf, NULL);
+    mod = *modbuf;
+
+    sq_getstring(v, 2, &rettype);
+
+    sq_getstring(v, 3, &symname);
+    sym = dlsym(mod, symname);
+    if (!sym)
+        return sq_throwerror(v, "Cannot find symbol");
+
     int nparam = sq_getsize(v, 4);
 
     int size = sizeof(struct FFIData) + sizeof(ffi_type*) * nparam;
     struct FFIData *ffibuf = (struct FFIData *)sq_newuserdata(v, size);
-    sq_pushobject(v, method_table);
+    sq_pushobject(v, ffi_method_table);
     sq_setdelegate(v, -2);
 
     printf("Allocated %d bytes at %p\n", size, ffibuf);
@@ -188,14 +207,27 @@ static void sq_register_funcs(HSQUIRRELVM sqvm, SQRegFunction *obj_funcs) {
    }
 }
 
+static SQInteger m_set_dlg(HSQUIRRELVM v)
+{
+    if (SQ_FAILED(sq_setdelegate(v, 2)))
+        return SQ_ERROR;
+    return 0;
+}
+
 static SQRegFunction funcs[] = {
     {"load", m_dlopen, 2, _SC(".s")},
     {"sym", m_dlsym, 3, _SC(".ps")},
-    {"ffi", m_ffi_prepare, 4, _SC(".psa")},
+    {"setdelegate",  m_set_dlg, 3, _SC("..t")},
     {NULL}
 };
 
-static SQRegFunction methods[] = {
+static SQRegFunction lib_methods[] = {
+    {"func", m_lib_func, -1, _SC("ussa")},
+//    {"var",  m_lib_var,  -1, _SC("uss")},
+    {NULL}
+};
+
+static SQRegFunction ffi_methods[] = {
     {"_call",  m_ffi_call, -1, _SC("u")},
     {NULL}
 };
@@ -238,10 +270,16 @@ SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
     }
 
     sq_newtable(v);
-    sq_register_funcs(v, methods);
-    sq_resetobject(&method_table);
-    sq_getstackobj(v, -1, &method_table);
-    sq_addref(v, &method_table);
+    sq_register_funcs(v, lib_methods);
+    sq_resetobject(&lib_method_table);
+    sq_getstackobj(v, -1, &lib_method_table);
+    sq_addref(v, &lib_method_table);
+
+    sq_newtable(v);
+    sq_register_funcs(v, ffi_methods);
+    sq_resetobject(&ffi_method_table);
+    sq_getstackobj(v, -1, &ffi_method_table);
+    sq_addref(v, &ffi_method_table);
 
     printf("out sqmodule_load\n");
 
