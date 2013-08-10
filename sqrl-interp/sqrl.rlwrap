@@ -1,0 +1,4 @@
+#!/bin/sh
+# If rlwrap is installed, use it for readline capabilities
+rlwrap -v >/dev/null 2>&1 && exec rlwrap ~/bin/sqrl.bin $@
+exec ~/bin/sqrl.bin $@

@@ -12,6 +12,15 @@ dummy := $(shell cd $(TOP); make -f makefile clean)
 
 include $(TOP)/makefile
 
-install: stdlibinit.nut
+install: sqrl sqrl.rlwrap stdlibinit.nut
 	mkdir -p ~/.squirrel/lib/
-	cp $^ ~/.squirrel/lib/
+	cp stdlibinit.nut ~/.squirrel/lib/
+	mkdir -p ~/bin
+	cp sqrl ~/bin/sqrl.bin
+	cp sqrl.rlwrap ~/bin/sqrl
+	@echo "=================================="
+	@echo "Squirrel interpreter with import support was installed in ~/bin/ ."
+	@echo "Make sure that you have that directory in your PATH and start"
+	@echo "interpreter using 'sqrl' command. 'rlwrap' package is recommended"
+	@echo "for comfortable interactive usage."
+	@echo "=================================="
