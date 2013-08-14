@@ -9,7 +9,7 @@ if [ ! -f $base/assert-check.nut ]; then
     exit 1
 fi
 
-$SQ $base/assert-check.nut
+$SQ $base/assert-check.nut 2>/dev/null
 if [ $? -eq 0 ]; then
     echo "FAILED: Squirrel interpreter doesn't properly return script exit status"
     exit 1
