@@ -27,6 +27,7 @@
 //
 
 #include "sqimport.h"
+#define BUILD_SQIMPORT
 #include "sqmodule.h"
 
 //#include "sqratlib/sqratBase.h"

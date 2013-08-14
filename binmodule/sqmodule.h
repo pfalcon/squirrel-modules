@@ -222,4 +222,8 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
+#ifndef BUILD_SQIMPORT
+#include "sqmodule_syms.h"
+#endif
+
 #endif /*_SQ_MODULE_H_*/
