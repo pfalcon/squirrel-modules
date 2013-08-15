@@ -13,15 +13,18 @@ Quick start:
 checkout modified Squirrel code as a git submodule. If you already
 cloned without --recursive, run "git submodule update".
 
-2. "make; make install". This will build "sqrl" interpreter with
+2. Install prerequisites. This includes: C++ compiler (GCC), GNU Make
+and libffi (libffi-dev package on Debian systems).
+
+3. "make; make install". This will build "sqrl" interpreter with
 module import support, and included modules, and will install them
 within your home directory (in ~/bin/ for binaries and scripts and
 in ~/.squirrel/ for modules).
 
-3. "export PATH=~/bin:$PATH", then run "sqrl".
+4. "export PATH=~/bin:$PATH", then run "sqrl".
 
 
-squirrel-modules consists of the following subdirs:
+squirrel-modules consists of the following components:
 
 binmodule
     Support for dynamically loadable binary (i.e. compiled C/C++ code)
