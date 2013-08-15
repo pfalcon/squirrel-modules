@@ -1,4 +1,4 @@
-SQUIRREL_PATH = ../../squirrel-lang
+SQUIRREL_PATH = ../squirrel-lang
 SQMODULE_PATH = ../binmodule
 
 CFLAGS = -I$(SQUIRREL_PATH)/include -I$(SQMODULE_PATH) $(OPT)
