@@ -1,5 +1,5 @@
-fin = file(vargv[0], "r")
-fout = file(vargv[1], "w")
+fin = file(vargv[1], "r")
+fout = file(vargv[2], "w")
 
 prefix = "sq"
 while (l = fin.readline()) {
