@@ -51,7 +51,7 @@
 
 typedef SQRESULT (*SQMODULELOAD)(HSQUIRRELVM v, HSQAPI sq);
 
-static HSQAPI sqapi = NULL;
+HSQAPI sqapi = NULL;
 
 // Create and populate the HSQAPI structure with function pointers
 // If new functions are added to the Squirrel API, they should be added here too

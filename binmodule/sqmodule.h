@@ -39,7 +39,7 @@
  #define MODULE_INIT SQMODCONC(sqmodule_load_, MODULE)
 #else
  #define SQAPI(meth) sqapi->meth
- #define DECLARE_SQAPI static HSQAPI sqapi;
+ #define DECLARE_SQAPI HSQAPI sqapi;
  #define INIT_SQAPI(vm, api) { sqapi = api; \
     if (api->version != SQMODULE_API_VERSION) \
       return api->throwerror(vm, _SC("API version mismatch on module load")); }
@@ -215,6 +215,10 @@ extern "C" {
         SQRESULT        (*getblob)(HSQUIRRELVM v,SQInteger idx,SQUserPointer *ptr);
     } sq_api;
     typedef sq_api* HSQAPI;
+
+#ifndef MODULE_STATIC
+    extern HSQAPI sqapi;
+#endif
 
     SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api);
 
