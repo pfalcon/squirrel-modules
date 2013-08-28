@@ -1,5 +1,6 @@
 #define MODULE ffi
 #include <sqmodule.h>
+#include <sqmodule_helpers.h>
 #include <stdio.h>
 #include <dlfcn.h>
 #include <ffi.h>
@@ -272,28 +273,6 @@ static SQInteger m_var_get(HSQUIRRELVM v)
     return 1;
 }
 
-static void sq_register_funcs(HSQUIRRELVM sqvm, SQRegFunction *obj_funcs) {
-   SQInteger i = 0;
-   while (obj_funcs[i].name != 0) {
-       SQRegFunction *f = &obj_funcs[i];
-       sq_pushstring(sqvm, f->name, -1);
-       sq_newclosure(sqvm, f->f, 0);
-       sq_setparamscheck(sqvm, f->nparamscheck, f->typemask);
-       sq_setnativeclosurename(sqvm, -1, f->name);
-       sq_newslot(sqvm, -3, SQFalse);
-       i++;
-   }
-}
-
-static void sq_create_method_table(HSQUIRRELVM vm, SQRegFunction *methods, HSQOBJECT *handle)
-{
-    sq_newtable(vm);
-    sq_register_funcs(vm, methods);
-    sq_resetobject(handle);
-    sq_getstackobj(vm, -1, handle);
-    sq_addref(vm, handle);
-}
-
 static SQInteger m_set_dlg(HSQUIRRELVM v)
 {
     if (SQ_FAILED(sq_setdelegate(v, 2)))
@@ -359,9 +338,9 @@ SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
         sq_newslot(v, -3, SQFalse);
     }
 
-    sq_create_method_table(v, lib_methods, &lib_method_table);
-    sq_create_method_table(v, func_methods, &func_method_table);
-    sq_create_method_table(v, var_methods, &var_method_table);
+    sq_create_delegate_table(v, lib_methods, &lib_method_table);
+    sq_create_delegate_table(v, func_methods, &func_method_table);
+    sq_create_delegate_table(v, var_methods, &var_method_table);
 
     return SQ_OK;
 }
