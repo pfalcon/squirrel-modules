@@ -48,11 +48,16 @@ ffi
     with arbitrary software written in compiled languages (usually C/C++).
 
 os, socket
-    Modules to write basic POSIX OS and socket functionality using FFI.
+    Modules to wrap basic POSIX OS and socket functionality using FFI.
+
+osstream
+    Implementaton of popen stream object (read/write from/to a child
+    process via pipe) and fdopen stream object (wrap POSIX file descriptors
+    in a stream object, useful for sockets and many other things).
 
 To use squirrel-modules, you need Squirrel with the patches to address
 some language misfeatures or lack of builtin functionality:
-https://github.com/pfalcon/squirrel-lang/tree/squirrel3-pfalcon
+https://github.com/pfalcon/squirrel-lang/tree/squirrel3-genpurpose
 (git clone --recursive pulls it automatically as a submodule).
 
 For more information about squirrel-modules ideas, see RFC on Squirrel
