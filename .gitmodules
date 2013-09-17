@@ -1,4 +1,4 @@
 [submodule "squirrel-lang"]
 	path = squirrel-lang
 	url = https://github.com/pfalcon/squirrel-lang.git
-	branch = squirrel3-pfalcon
+	branch = squirrel3-genpurpose
