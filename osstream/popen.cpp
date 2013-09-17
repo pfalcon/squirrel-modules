@@ -1,12 +1,9 @@
-#define MODULE popen
 #include <sqmodule.h>
 #include <sqmodule_helpers.h>
 #include <sqstdio.h>
 #include <stdio.h>
 #include <string.h>
 #include <new>
-
-DECLARE_SQAPI
 
 struct POpenStream : public SQStream
 {
@@ -58,34 +55,6 @@ private:
 
 static const SQChar popen_class[] = _SC("popen");
 
-static SQRESULT declare_stream(HSQUIRRELVM v, const SQChar *cls, SQRegFunction *methods)
-{
-    SQInteger top = sq_gettop(v);
-
-    sq_pushregistrytable(v);
-    // Push class name much beforehand, because it should go before value
-    // for sq_newslot()
-    sq_pushstring(v, cls, -1);
-
-    // Lookup stream base class in registry table
-    sq_pushstring(v, _SC("std_stream"), -1);
-    if (SQ_SUCCEEDED(sq_get(v, -3))) {
-        // Inherit from stream class
-        sq_newclass(v, SQTrue);
-        // As a type tag, we use address of (constant, unique) class string
-        sq_settypetag(v, -1, (SQUserPointer)cls);
-
-        sq_register_funcs(v, methods);
-
-        // Associate created class with its name in namespace table
-        sq_newslot(v, -4, SQFalse);
-        sq_settop(v, top);
-        return SQ_OK;
-    }
-    sq_settop(v,top);
-    return SQ_ERROR;
-}
-
 static SQInteger popen_close(HSQUIRRELVM v)
 {
     POpenStream *self = NULL;
@@ -134,9 +103,7 @@ static SQRegFunction popen_methods[] = {
     {NULL}
 };
 
-SQRESULT MODULE_INIT(HSQUIRRELVM v, HSQAPI api)
+SQRESULT init_popen(HSQUIRRELVM v)
 {
-    INIT_SQAPI(v, api);
-
     return declare_stream(v, popen_class, popen_methods);
 }

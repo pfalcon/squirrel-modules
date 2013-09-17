@@ -27,5 +27,32 @@ static inline void sq_create_delegate_table(HSQUIRRELVM vm, SQRegFunction *metho
     sq_addref(vm, handle);
 }
 
+static inline SQRESULT declare_stream(HSQUIRRELVM v, const SQChar *cls, SQRegFunction *methods)
+{
+    SQInteger top = sq_gettop(v);
+
+    sq_pushregistrytable(v);
+    // Push class name much beforehand, because it should go before value
+    // for sq_newslot()
+    sq_pushstring(v, cls, -1);
+
+    // Lookup stream base class in registry table
+    sq_pushstring(v, _SC("std_stream"), -1);
+    if (SQ_SUCCEEDED(sq_get(v, -3))) {
+        // Inherit from stream class
+        sq_newclass(v, SQTrue);
+        // As a type tag, we use address of (constant, unique) class string
+        sq_settypetag(v, -1, (SQUserPointer)cls);
+
+        sq_register_funcs(v, methods);
+
+        // Associate created class with its name in namespace table
+        sq_newslot(v, -4, SQFalse);
+        sq_settop(v, top);
+        return SQ_OK;
+    }
+    sq_settop(v,top);
+    return SQ_ERROR;
+}
 
 #endif // _SQMODULE_HELPERS_H
