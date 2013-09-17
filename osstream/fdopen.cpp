@@ -22,8 +22,18 @@ struct FdOpenStream : public SQStream
     SQInteger Read(void *buffer, SQInteger size)
         { return read(_fd, buffer, size); }
 
-    SQInteger Readline(void *buffer, SQInteger size)
-        { return -1; }
+    SQInteger Readline(void *buffer, SQInteger size) {
+        // This is grossly inefficient, and should be
+        // used only if one doesn't care about efficiency
+        int r;
+        char *p = (char*)buffer;
+        while ((r = read(_fd, p, 1)) >= 0) {
+            if (r == 0 || *p++ == '\n') {
+                return p - (char*)buffer;
+            }
+        }
+        return -1;
+    }
 
     SQInteger Write(void *buffer,SQInteger size)
         { return write(_fd, buffer, size); }
