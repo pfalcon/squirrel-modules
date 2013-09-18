@@ -1,4 +1,5 @@
 import("ffi")
+import_from("osstream", "fdopen")
 
 local l = ffi.load("libc.so.6")
 
@@ -27,4 +28,17 @@ function sockaddr_in(sin_addr, sin_port) {
     addr.writen(0, 'i')
     addr.writen(0, 'i')
     return addr
+}
+
+// Factory function for higher-level (connected) socket
+//object implementing stream interface.
+function Socket(addr, port) {
+    assert(type(addr) == "array")
+    assert(addr.len() == 4)
+    sa = sockaddr_in(addr, port)
+    fd = socket(AF_INET, SOCK_STREAM, 0)
+    r = connect(fd, sa, sa.len())
+    if (r == -1)
+        throw "error in connect()"
+    return fdopen(fd)
 }
