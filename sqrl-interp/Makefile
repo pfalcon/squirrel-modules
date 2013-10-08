@@ -5,6 +5,8 @@ INCLUDE_EXTRA = -I$(SQIMPORT)
 VPATH = $(TOP)
 SQ_OBJS_EXTRA = $(SQIMPORT)/sqimport.o static_modules_init.o
 LDLIBS = -ldl
+# For backtrace support
+# -rdynamic
 
 # For VPATH to work as expected, there should be NO compiled
 # objects in VPATH directory, so let's force clean them.
