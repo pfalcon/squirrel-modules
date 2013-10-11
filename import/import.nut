@@ -1,6 +1,27 @@
 /*
   Import module into a separate namespace.
 
+  Returns this namespace.
+*/
+__modules = {}
+function require(module) {
+    if (module in __modules)
+        return __modules[module];
+
+    local save = getroottable()
+    // Let loaded module reuse already loaded modules
+    __pristine_env.__modules = __modules
+    local modenv = clone __pristine_env;
+    setroottable(modenv)
+    _import_(module)
+    setroottable(save)
+    __modules[module] = modenv;
+    return modenv;
+}
+
+/*
+  Import module into a separate namespace.
+
   Examples:
 
   import("foo")
@@ -15,9 +36,7 @@
 */
 
 function import(module, as = null) {
-    local modenv = {};
-    _import_(module, modenv)
-    getroottable()[as ? as : module] = modenv;
+    getroottable()[as ? as : module] = require(module);
 }
 
 
@@ -43,20 +62,15 @@ function import(module, as = null) {
     Imports "bar" from module "foo" into current namespace as "bar2".
     This works with single symbol only.
 */
-__modules = []
 function import_from(module, what, as = null) {
     if (what == "*") {
+        // Shortcut implementation for all symbols -
+        // this doesn't run module with separate roottable,
+        // to avoid copying all (including standard symbols)
+        // Thus, it exposes current running environment to the module
         _import_(module)
     } else {
-        local save = getroottable();
-        // TODO: We should not clone *current* roottable, we should
-        // pass in some "pristine" roottable to enforce data separation.
-        // This applies to all import cases actually.
-        local modenv = clone getroottable();
-        setroottable(modenv);
-        _import_(module, modenv);
-        setroottable(save);
-        __modules.append(modenv);
+        local modenv = require(module);
         if (as) {
             getroottable()[as] = modenv[what];
             return;
@@ -68,3 +82,7 @@ function import_from(module, what, as = null) {
             getroottable()[n] = modenv[n];
     }
 }
+
+
+// Capture pristine environment with just import functions added
+__pristine_env = clone getroottable();
