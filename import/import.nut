@@ -43,12 +43,17 @@ function import(module, as = null) {
     Imports "bar" from module "foo" into current namespace as "bar2".
     This works with single symbol only.
 */
+__modules = []
 function import_from(module, what, as = null) {
     if (what == "*") {
         _import_(module)
     } else {
+        local save = getroottable();
         local modenv = {};
+        setroottable(modenv);
         _import_(module, modenv);
+        setroottable(save);
+        __modules.append(modenv);
         if (as) {
             getroottable()[as] = modenv[what];
             return;
