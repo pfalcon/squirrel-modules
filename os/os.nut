@@ -11,3 +11,9 @@ _("i", "read", ["i", "P", "I"])
 _("i", "write", ["i", "P", "I"])
 _("i", "close", ["i"])
 _("i", "perror", ["s"])
+
+errno = l.var("i", "errno")
+
+function _errno() {
+    return errno.get()
+}
