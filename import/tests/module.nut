@@ -1,3 +1,5 @@
+import("module2")
+
 function func()
 {
     return "This is func";
