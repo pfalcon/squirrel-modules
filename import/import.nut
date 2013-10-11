@@ -49,7 +49,10 @@ function import_from(module, what, as = null) {
         _import_(module)
     } else {
         local save = getroottable();
-        local modenv = {};
+        // TODO: We should not clone *current* roottable, we should
+        // pass in some "pristine" roottable to enforce data separation.
+        // This applies to all import cases actually.
+        local modenv = clone getroottable();
         setroottable(modenv);
         _import_(module, modenv);
         setroottable(save);
