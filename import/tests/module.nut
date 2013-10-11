@@ -5,5 +5,6 @@ function func()
 
 function func2()
 {
+    func();
     return "func2 speaking";
 }
